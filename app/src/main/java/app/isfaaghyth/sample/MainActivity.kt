@@ -4,8 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import app.isfaaghyth.graphql.Gql
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
@@ -16,17 +14,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        Gql.init("https://api.spacex.land/graphql/")
-
-//        Gql.init(
-//            "https://graphql.anilist.co/",
-//            OkHttpClient().newBuilder()
-//                .addInterceptor(HttpLoggingInterceptor().apply {
-//                    setLevel(HttpLoggingInterceptor.Level.BODY)
-//                })
-//                .build()
-//        )
 
         val gqlQuery = """
             query launchesPast(${'$'}limit: Int) {
@@ -45,10 +32,10 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 .parameters(mapOf(
                     "limit" to 10
                 ))
-                .get<Data>(
+                .get(
                     onSuccess = {
                         withContext(Dispatchers.Main) {
-                            println(it.data)
+                            println(it)
                         }
                     },
                     onError = {
@@ -61,19 +48,3 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     }
 
 }
-
-data class Data(
-    val data: ArtsyResponse? = null
-)
-
-data class ArtsyResponse(
-    val popular_artists: PopularArtists? = null
-)
-
-data class PopularArtists(
-    val artists: List<Artist> = emptyList()
-)
-
-data class Artist(
-    val name: String
-)

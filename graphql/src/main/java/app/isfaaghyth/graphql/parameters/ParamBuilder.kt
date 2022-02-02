@@ -4,10 +4,6 @@ import org.json.JSONObject
 
 interface ParamBuilder {
 
-    val request: JSONObject
-
-    val parameters: JSONObject
-
     fun newBuilder(): Builder
 
     class Builder constructor(
@@ -25,7 +21,7 @@ interface ParamBuilder {
                 val key = it.key
                 val value = it.value
 
-                if (!paramValidator(value)) error(
+                if (!isParamValid(value)) error(
                     """
                         Seems you're put an expected parameter data type,
                         the gql only supported 3 types (String, Boolean, and Int
@@ -43,6 +39,15 @@ interface ParamBuilder {
             )
 
             return request.toString()
+        }
+
+        /**
+         * Because of gql only supported 3 data types,
+         * we need this validator to ensure the parameters
+         * should be as expected.
+         */
+        private fun isParamValid(arg: Any): Boolean {
+            return (arg is String || arg is Int || arg is Boolean)
         }
 
     }

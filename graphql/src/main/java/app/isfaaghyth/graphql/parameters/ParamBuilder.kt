@@ -21,7 +21,7 @@ interface ParamBuilder {
                 val key = it.key
                 val value = it.value
 
-                if (!isParamValid(value)) error(
+                if (!value.isValid()) error(
                     """
                         Seems you're put an expected parameter data type,
                         the gql only supported 3 types (String, Boolean, and Int
@@ -46,8 +46,8 @@ interface ParamBuilder {
          * we need this validator to ensure the parameters
          * should be as expected.
          */
-        private fun isParamValid(arg: Any): Boolean {
-            return (arg is String || arg is Int || arg is Boolean)
+        private fun Any.isValid(): Boolean {
+            return (this is String || this is Int || this is Boolean)
         }
 
     }

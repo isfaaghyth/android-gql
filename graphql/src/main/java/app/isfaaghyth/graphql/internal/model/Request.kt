@@ -1,4 +1,4 @@
-package app.isfaaghyth.graphql.internal.parameters
+package app.isfaaghyth.graphql.internal.model
 
 data class Request(
     val query: String,

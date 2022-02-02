@@ -4,8 +4,8 @@ package app.isfaaghyth.graphql
 
 import app.isfaaghyth.graphql.data.GqlResult
 import app.isfaaghyth.graphql.internal.GqlRequestBuilder
-import app.isfaaghyth.graphql.internal.parameters.Network
-import app.isfaaghyth.graphql.internal.parameters.Request
+import app.isfaaghyth.graphql.internal.model.Network
+import app.isfaaghyth.graphql.internal.model.Request
 import app.isfaaghyth.graphql.utils.MessageErrorException
 import app.isfaaghyth.graphql.utils.message
 import com.google.gson.Gson

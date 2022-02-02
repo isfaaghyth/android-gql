@@ -1,4 +1,4 @@
-package app.isfaaghyth.graphql.internal.parameters
+package app.isfaaghyth.graphql.internal.model
 
 import okhttp3.OkHttpClient
 

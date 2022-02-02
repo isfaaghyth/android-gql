@@ -1,7 +1,7 @@
 package app.isfaaghyth.graphql.internal
 
-import app.isfaaghyth.graphql.internal.parameters.Network
-import app.isfaaghyth.graphql.internal.parameters.Request
+import app.isfaaghyth.graphql.internal.model.Network
+import app.isfaaghyth.graphql.internal.model.Request
 import app.isfaaghyth.graphql.parameters.GqlParamBuilder
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
@@ -28,13 +28,58 @@ class GqlRequestBuilder constructor(
     override val okHttpClient: OkHttpClient
         get() = network.okHttpClient?: defaultOkHttpClient()
 
-    private val gqlParams = mutableMapOf<String, Any>()
+    /**
+     * Validator of graphql parameters
+     *
+     * @param params
+     */
+    private fun isQueryParamAcceptable(params: Map<String, Any>) {
+        // first, we need to parse and extract the parameter of gql from query
+        val gqlParamDataType = mutableMapOf<String, Any>()
+        val parameters = parameterParser(request.query)
 
+        // second, add all parameters are indicated on gql query
+        gqlParamDataType.clear()
+        gqlParamDataType.putAll(parameters)
+
+        /*
+        * we must validate the number of parameters received from the user,
+        * the amount of parameter must match with the indicated parameters.
+        * */
+        if (gqlParamDataType.size != params.size) {
+            throw ArrayIndexOutOfBoundsException("the amount of parameter must match with the indicated parameters.")
+        }
+
+        /*
+        * after validating the amount of parameters,
+        * we need to ensure the data type also is match.
+        * */
+        val invalidParams = mutableListOf<String>()
+
+        gqlParamDataType.keys.forEach {
+            if (Class.forName(gqlParamDataType[it].toString()) != params[it]?.javaClass) {
+                invalidParams.add(it)
+            }
+        }
+
+        if (invalidParams.isNotEmpty()) {
+            throw IllegalArgumentException("your data type of $invalidParams is not match with parameter on gql query.")
+        }
+    }
+
+    /**
+     * Create request body from gql query parameter
+     *
+     * @return [RequestBody]
+     */
     private fun buildRequestBody(): RequestBody {
+        // get parameters from user's input
         val queryParameters = request.parameters?: mapOf()
 
-        getOrCreateGqlParams(queryParameters)
+        // validation between the parameters input and gql query param
+        isQueryParamAcceptable(queryParameters)
 
+        // create request body based on parameters
         return GqlParamBuilder(request.query)
             .newBuilder()
             .putParam(queryParameters)
@@ -42,6 +87,11 @@ class GqlRequestBuilder constructor(
             .toRequestBody(mediaType)
     }
 
+    /**
+     * Set custom headers if any
+     *
+     * @return [Headers]
+     */
     private fun buildHeaders(): Headers {
         return Headers.Builder().apply {
             if (network.headers.isNotEmpty()) {
@@ -55,29 +105,11 @@ class GqlRequestBuilder constructor(
         }.build()
     }
 
-    private fun getOrCreateGqlParams(params: Map<String, Any>) {
-        // first, add all parameters are indicated on gql query
-        gqlParams.clear()
-        gqlParams.putAll(parameterParser(request.query))
-
-        /*
-        * we must validate the number of parameters received from the user,
-        * the amount of parameter must match with the indicated parameters.
-        * */
-        if (gqlParams.size != params.size)
-            throw ArrayIndexOutOfBoundsException("the amount of parameter must match with the indicated parameters.")
-
-        /*
-        * after validating the amount of parameters,
-        * we need to ensure the data type also is match.
-        * */
-        gqlParams.keys.forEach {
-            if (Class.forName(gqlParams[it] as String) != params[it]?.javaClass) {
-                throw IllegalArgumentException("your data type of $it is not match with parameter on gql query.")
-            }
-        }
-    }
-
+    /**
+     * Create the default okhttp client request if there's no custom builder
+     *
+     * @return [OkHttpClient]
+     */
     private fun defaultOkHttpClient() =
         OkHttpClient().newBuilder()
             .connectTimeout(REQUEST_TIMEOUT, TimeUnit.SECONDS)

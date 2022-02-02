@@ -1,7 +1,7 @@
 package app.isfaaghyth.graphql.internal
 
-import app.isfaaghyth.graphql.internal.parameters.Network
-import app.isfaaghyth.graphql.internal.parameters.Request
+import app.isfaaghyth.graphql.internal.model.Network
+import app.isfaaghyth.graphql.internal.model.Request
 import org.junit.Test
 
 class GqlRequestBuilderTest {

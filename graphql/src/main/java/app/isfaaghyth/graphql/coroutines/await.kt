@@ -21,9 +21,14 @@ suspend fun Call.await(debug: Boolean = false): Response {
         null
     }
 
+    /**
+     * use the suspend cancellable coroutine for wrap the [Response]
+     * and making as suspend function (coroutine-supported)
+     */
     return suspendCancellableCoroutine {
         enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                // return empty if the request has cancelled
                 if (it.isCancelled) return
 
                 stackTrace?.initCause(e)
@@ -38,6 +43,8 @@ suspend fun Call.await(debug: Boolean = false): Response {
         it.invokeOnCancellation {
             try {
                 cancel()
+
+                // ignored the cancel throwable
             } catch (ignored: Throwable) {}
         }
     }

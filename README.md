@@ -4,9 +4,10 @@ An alternative network library for executing queries or mutations from a GraphQL
 
 This lib takes care of every single use-case from GraphQL requests, and the lib is ready to go for getting the data safely. As simple as creating a Gql builder and listen to the response!
 
-## Notes
+## Features
 - It uses OkHttp and already supported HTTP/2
 - Coroutine-first, the return value is suspend function
+- Supported for multiple queries or nested-query at the same request
 
 ***
 
@@ -63,7 +64,7 @@ Gql.query(query)
 A request with parameters
 ```kt
 val query = """
-    query user_info($id: String, $token: Int, $is_active: Boolean) {
+    query user_info(${'$'}id: String, ${'$'}token: Int, ${'$'}is_active: Boolean) {
         userInfo {
             id
             name
@@ -113,5 +114,9 @@ val response = Gql
         )
 
 ```
+
+### On-Progress 👷🏽‍
+- `.create(GqlServices::java.class)` extension for simplified (the design will similar like Retrofit)
+- Supported for a raw file for gql query
 
 @isfaaghyth
